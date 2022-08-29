@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/activity_mainlist.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/activity_register.xml" value="0.17831813576494426" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/activity_todo.xml" value="0.22" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/activity_todo_adapter.xml" value="0.33" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/activity_todo_main.xml" value="0.33" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/fragment_add.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/fragment_list.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/fragment_lists.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Ochi/AndroidStudioProjects/TestCLBS/app/src/main/res/layout/frangment_list.xml" value="0.18802083333333333" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
