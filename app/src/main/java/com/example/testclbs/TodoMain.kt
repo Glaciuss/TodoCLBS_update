@@ -1,6 +1,7 @@
 package com.example.testclbs
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +10,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.testclbs.databinding.ActivityMainBinding
+import com.example.testclbs.databinding.ActivityTodoMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -30,10 +33,13 @@ class TodoMain : AppCompatActivity() {
     private var todoArrayList =  ArrayList<Todo>()
     //recycle view
     private lateinit var todoRecyclerView: RecyclerView
+    //binding
+    private lateinit var binding: ActivityTodoMainBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityTodoMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_todo_main)
         todoAdapter = TodoAdapter(arrayListOf())
 
@@ -44,6 +50,7 @@ class TodoMain : AppCompatActivity() {
         databaseReference = database.getReference("TodoStorage1")
         firebaseStorage = FirebaseStorage.getInstance()
         firebaseAuth = FirebaseAuth.getInstance()
+        checkUser()
 
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
@@ -77,6 +84,18 @@ class TodoMain : AppCompatActivity() {
             deleteTodoData()
         }
         updateText()
+    }
+
+    private fun checkUser() {
+        //get current
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null){
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
+        else{
+            val email = firebaseUser.email
+        }
     }
 
     private fun onBindingFirebase() {
@@ -136,8 +155,5 @@ class TodoMain : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
-        //databaseReference.removeValue()
-        //databaseReference.child("-NA_KskzvsgSZMyGAhp8").removeValue()
-        //Toast.makeText(this@TodoMain,"DeleteTodo",Toast.LENGTH_SHORT).show()
     }
 }
