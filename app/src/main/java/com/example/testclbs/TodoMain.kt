@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -49,8 +50,10 @@ class TodoMain : AppCompatActivity() {
     private lateinit var binding: ActivityTodoMainBinding
     //add bt
     private lateinit var addsBtn: FloatingActionButton
+    private lateinit var btnSignOut: Button
     //app Database
     private lateinit var appDb : AppDatabase
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,8 +63,10 @@ class TodoMain : AppCompatActivity() {
 
         todoRecyclerView = findViewById(R.id.rvTodoItems)
         addsBtn = findViewById(R.id.btnAdd)
+        btnSignOut = findViewById(R.id.btnSignOut)
         //set dialog
         addsBtn.setOnClickListener{addInfo()}
+        btnSignOut.setOnClickListener {logoutFirebase()}
 
         appDb = AppDatabase.getDatabase(this)
 
@@ -93,6 +98,15 @@ class TodoMain : AppCompatActivity() {
             updateText()
         }*/
     }
+
+    private fun logoutFirebase() {
+        FirebaseAuth.getInstance().signOut()
+        val intentSession = Intent(this, LoginActivity::class.java)
+        startActivity(intentSession)
+        finish()
+        Toast.makeText(this,"Logout",Toast.LENGTH_SHORT).show()
+    }
+
 
     override fun onResume() {
         super.onResume()
