@@ -4,19 +4,31 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.testclbs.databinding.ActivityMainBinding
+import androidx.room.PrimaryKey
+import com.example.testclbs.data.AppDatabase
+import com.example.testclbs.data.User
 import com.example.testclbs.databinding.ActivityTodoMainBinding
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_todo_adapter.*
 import kotlinx.android.synthetic.main.activity_todo_main.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class TodoMain : AppCompatActivity() {
 
@@ -35,7 +47,10 @@ class TodoMain : AppCompatActivity() {
     private lateinit var todoRecyclerView: RecyclerView
     //binding
     private lateinit var binding: ActivityTodoMainBinding
-
+    //add bt
+    private lateinit var addsBtn: FloatingActionButton
+    //app Database
+    private lateinit var appDb : AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,15 +59,24 @@ class TodoMain : AppCompatActivity() {
         todoAdapter = TodoAdapter(arrayListOf())
 
         todoRecyclerView = findViewById(R.id.rvTodoItems)
+        addsBtn = findViewById(R.id.btnAdd)
+        //set dialog
+        addsBtn.setOnClickListener{addInfo()}
+
+        appDb = AppDatabase.getDatabase(this)
 
         // Write a message to the database
         database = FirebaseDatabase.getInstance("https://testcls-c7487-default-rtdb.asia-southeast1.firebasedatabase.app/")
-        databaseReference = database.getReference("TodoStorage1")
+
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
+        databaseReference = database.getReference("users/getData")
+        System.out.println("key? = " + userId)
         firebaseStorage = FirebaseStorage.getInstance()
         firebaseAuth = FirebaseAuth.getInstance()
         checkUser()
 
-        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        //val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
         //rvTodoItems.adapter = todoAdapter
         rvTodoItems.layoutManager = LinearLayoutManager(this)
@@ -60,30 +84,71 @@ class TodoMain : AppCompatActivity() {
         //Bind firebase
         onBindingFirebase()
 
-        btnAddTodo.setOnClickListener {
-            val todoTitle = etTodoTitle.text.toString()
-            val todoDetail = etTodoDetail.text.toString()
-            if(todoTitle.isNotEmpty()) {
+        updateRoom()
 
-                //not storage
-                //val todo = Todo(todoTitle, details =  todoDetail)
-                //todoAdapter.addTodo(todo)
+        /*btnAddTodo.setOnClickListener {
 
-                //Add to storage
-                var model = Todo(todoTitle,todoDetail)
-                var id = databaseReference.push().key
-                databaseReference.child(id!!).setValue(model)
-                Toast.makeText(this@TodoMain,"SaveTodo",Toast.LENGTH_SHORT).show()
+        }*/
+        /*btnDeleteDoneTodos.setOnClickListener {
+            updateText()
+        }*/
+    }
 
-                etTodoTitle.text.clear()
-                etTodoDetail.text.clear()
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch(Dispatchers.IO){
+            val list = appDb.userDao().getAll()
+            binding.rvTodoItems.apply {
+                layoutManager = LinearLayoutManager(this@TodoMain)
+                /*adapter = TodoAdapter().apply {
+                    setOnAc
+                }*/
             }
         }
-        btnDeleteDoneTodos.setOnClickListener {
-            //todoAdapter.deleteDoneTodos()
-            deleteTodoData()
+    }
+
+    private fun addInfo() {
+        val inflter = LayoutInflater.from(this)
+        val v = inflter.inflate(R.layout.add_item,null)
+        //set view
+        val todoTitle = v.findViewById<EditText>(R.id.TodoTitle)
+        val todoDetail = v.findViewById<EditText>(R.id.TodoDetail)
+        val addDialog = AlertDialog.Builder(this)
+        addDialog.setView(v)
+        addDialog.setPositiveButton("Ok"){
+            dialog,_->
+            val title = todoTitle.text.toString()
+            val detail = todoDetail.text.toString()
+            if(title.isNotEmpty() && detail.isNotEmpty()) {
+
+                //Create User object
+                val user = User(null,title,detail)
+
+                //Add Data to database
+                GlobalScope.launch(Dispatchers.IO){
+                    appDb.userDao().insert(user)
+                }
+                Toast.makeText(this,"successfully added",Toast.LENGTH_SHORT).show()
+
+                //Add to storage
+                val userId = FirebaseAuth.getInstance().currentUser!!.uid
+                databaseReference = database.getReference("users/$userId/getData")
+                val id = databaseReference.push().key
+                databaseReference.child(id!!).setValue(user)
+                Toast.makeText(this,"Adding todo information success",Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(this,"Please fill",Toast.LENGTH_SHORT).show()
+            }
+            dialog.dismiss()
         }
-        updateText()
+        addDialog.setNegativeButton("Cancel"){
+            dialog,_->
+            dialog.dismiss()
+            Toast.makeText(this,"Cancel",Toast.LENGTH_SHORT).show()
+        }
+        addDialog.create()
+        addDialog.show()
     }
 
     private fun checkUser() {
@@ -99,6 +164,9 @@ class TodoMain : AppCompatActivity() {
     }
 
     private fun onBindingFirebase() {
+        //clear data in list and add current list in firebase to list
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        databaseReference = database.getReference("users/$userId/getData")
         databaseReference.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
@@ -107,23 +175,54 @@ class TodoMain : AppCompatActivity() {
                         val user = userSnapshot.getValue(Todo::class.java)
                         todoArrayList.add(user as Todo)
                     }
-                    if(todoArrayList.size>0){
+                    //show list that add in firebase
+                    if(todoArrayList.size>=1){
                         val adapter = TodoAdapter(todoArrayList)
                         rvTodoItems.adapter = adapter
                     }
+                }
+                else{
+                    //show 0 list
+                    todoArrayList.clear()
+                    val adapter = TodoAdapter(todoArrayList)
+                    rvTodoItems.adapter = adapter
                 }
             }
             override fun onCancelled(snapshot: DatabaseError) {
                 Log.e("cancel", snapshot.toString())
             }
         })
-
-
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun updateText(){
-        btnHideKeypad.setOnClickListener{
+        /*btnHideKeypad.setOnClickListener{
             closeKeyboard(etTodoTitle)
+
+            //Add Delete to database
+            GlobalScope.launch(Dispatchers.IO){
+                appDb.userDao().deleteAll()
+            }
+        }*/
+    }
+
+    private fun updateRoom(){
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        databaseReference = database.getReference("users/$userId/getData")
+        //delete todo in firebase
+        databaseReference.removeValue()
+
+        lifecycleScope.launch(Dispatchers.IO){
+            val list = appDb.userDao().getAll()
+            //appDb.userDao().delete("1552")
+            System.out.println("List size = " + list.size + " List data = " + list)
+
+            //add room data to firebase
+            for (item in list){
+                print("Item in List = $item")
+                val id = databaseReference.push().key
+                databaseReference.child(id!!).setValue(item)
+            }
         }
     }
 
@@ -132,8 +231,8 @@ class TodoMain : AppCompatActivity() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun deleteTodoData(){
-        
+    /*private fun deleteTodoData(){
+
         var query = databaseReference.orderByChild("checked").equalTo(false)
         query.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildKey: String?) {
@@ -145,15 +244,12 @@ class TodoMain : AppCompatActivity() {
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
             }
-
             override fun onChildRemoved(snapshot: DataSnapshot) {
             }
-
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
             }
-
             override fun onCancelled(error: DatabaseError) {
             }
         })
-    }
+    }*/
 }

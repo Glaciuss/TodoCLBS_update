@@ -3,6 +3,7 @@ package com.example.testclbs
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -17,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.sql.ClientInfoStatus
 import java.sql.DatabaseMetaData
@@ -33,6 +35,8 @@ class LoginActivity : AppCompatActivity() {
 
     private var mAuth: FirebaseAuth? = null
     private lateinit var database: FirebaseDatabase
+    //data reference
+    private lateinit var databaseReference: DatabaseReference
 
     //view binding
     private lateinit var binding: ActivityMainBinding
@@ -82,9 +86,16 @@ class LoginActivity : AppCompatActivity() {
         }
 
         buttonLogin!!.setOnClickListener{
-            loginEmail()
+            email = txtEmail!!.text.toString()
+            password = txtPassword!!.text.toString()
+            if(email.isEmpty()||password.isEmpty()){
+                Toast.makeText(this@LoginActivity,"Please fill",Toast.LENGTH_SHORT).show()
+            }
+            else{
+                loginEmail()
+                buttonLogin.isEnabled = false
+            }
         }
-
     }
 
     private fun checkUser() {
@@ -124,8 +135,8 @@ class LoginActivity : AppCompatActivity() {
                 val email = firebaseUser!!.email
                 Log.d(TAG,"firebaseAuthWithGoogleAccount: Email: $email")
 
-                val databaseReference = database.reference.child("users").push()
-                databaseReference.child("uid").setValue(firebaseUser!!.email)
+                databaseReference = database.getReference("users/" + firebaseUser!!.uid)
+                databaseReference.child("email").setValue(firebaseUser!!.email)
 
                 //check user new/exist
                 if(authResult.additionalUserInfo!!.isNewUser){
@@ -148,10 +159,6 @@ class LoginActivity : AppCompatActivity() {
                 Log.d(TAG,"firebaseAuthWithGoogleAccount: Login failed due to ${e.message}")
                 Toast.makeText(this@LoginActivity,"Login failed due to ${e.message}",Toast.LENGTH_SHORT).show()
             }
-        //get data from old user
-        val databaseReference = database.getReference("users")
-        var query = databaseReference.orderByChild("email").equalTo(email)
-        System.out.println("+++++++++++++++++++++++++++++++++++++++")
     }
 
     override fun  onStart(){
@@ -161,16 +168,16 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginEmail() {
-        email = txtEmail!!.text.toString()
-        password = txtPassword!!.text.toString()
+        val email = txtEmail!!.text.toString()
+        val password = txtPassword!!.text.toString()
         mAuth!!.signInWithEmailAndPassword(email,password).addOnCompleteListener(this) {
                 task -> if(task.isSuccessful){
             Log.d("MyApp","CreateNewUserSuccess!")
             val user = mAuth!!.currentUser
 
-            val databaseReference = database.reference.child("users").push()
-            databaseReference.child("uid").setValue(user!!.uid)
-            databaseReference.child("email").setValue(user.email)
+            databaseReference = database.getReference("users/" + user!!.uid)
+            //databaseReference.child("uid").setValue(user!!.uid)
+            databaseReference.child("email").setValue(user!!.email)
 
             updateUI(user)
         } else{
