@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#fff"
+    android:gravity="center_horizontal"
+    tools:context=".update.Update">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:textSize="30sp"
+        android:textColor="#3A3A3A"
+        android:textStyle="bold"
+        android:text="Update Task" />
+    <EditText
+        android:layout_marginTop="20sp"
+        android:id="@+id/updateTitle"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:textColor="#000"
+        android:textColorHint="#676767"
+        android:inputType="textPersonName"
+        android:hint="Name" />
+
+    <EditText
+        android:id="@+id/updateSubtitle"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:textColor="#000"
+        android:textColorHint="#676767"
+        android:hint="subtitle"
+        android:inputType="textMultiLine"/>
+
+    <Button
+        android:id="@+id/updateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#5E5E5E"
+        android:text="Update"
+        android:textColor="#fff"
+        android:clickable="true"
+        android:textAllCaps="false"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="#fff"
+    tools:context=".insert.Insert">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:textSize="30sp"
+        android:textColor="#3A3A3A"
+        android:textStyle="bold"
+        android:text="Insert Task" />
+
+    <EditText
+        android:id="@+id/insertTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="20sp"
+        android:ems="10"
+        android:hint="Title"
+        android:inputType="textPersonName"
+        android:textColor="#000"
+        android:textColorHint="#676767" />
+
+    <EditText
+        android:id="@+id/insertSub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:hint="Detail"
+        android:inputType="textMultiLine"
+        android:textColor="#000"
+        android:textColorHint="#676767" />
+
+    <Button
+        android:id="@+id/viewInsertBtn"
+        android:layout_width="wrap_content"
+        android:backgroundTint="#5E5E5E"
+        android:layout_height="wrap_content"
+        android:text="Insert"
+        android:textColor="#fff"
+        android:textAllCaps="false"/>
+
+
+</LinearLayout>

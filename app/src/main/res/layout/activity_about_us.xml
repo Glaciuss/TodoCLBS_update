@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AboutUs"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="#fff">
+
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:srcCompat="@drawable/persojn" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="30sp"
+        android:textColor="#818181"
+        android:text="About Us" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="30sp"
+        android:gravity="center"
+        android:lineSpacingExtra="10sp"
+        android:text="This app is build for test project\nThe target of this app to remain on todolist for the learning and useablity\nFor further regardds contact at\ ontninjao@gmail.com"
+        android:textColor="#818181"
+        android:textSize="20sp" />
+
+
+</LinearLayout>
