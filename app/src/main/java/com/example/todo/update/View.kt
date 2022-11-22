@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.todo.DataBase.User
 import com.example.todo.DataBase.UserViewModel
 import com.example.todo.R
 import com.google.firebase.auth.FirebaseAuth
@@ -36,22 +35,9 @@ class View : Fragment() {
 
         mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
-        view.updateBtn.setOnClickListener{
-            val action = ViewDirections.actionViewToUpdate(User(args.viewParcel.id,args.viewParcel.title,args.viewParcel.subTitle,args.viewParcel.date,args.viewParcel.check))
-            findNavController().navigate(action)
-        }
-        view.DoneBtn.setOnClickListener{
-            val userUpdate = User(args.viewParcel.id,args.viewParcel.title,args.viewParcel.subTitle,args.viewParcel.date,check = true)
-            mUserViewModel.updateUser(userUpdate)
-            findNavController().navigate(R.id.action_view_to_list)
-        }
-        view.NotDoneBtn.setOnClickListener{
-            val userUpdate = User(args.viewParcel.id,args.viewParcel.title,args.viewParcel.subTitle,args.viewParcel.date,check = false)
-            mUserViewModel.updateUser(userUpdate)
-            findNavController().navigate(R.id.action_view_to_list)
-        }
+        deleteUser()
 
-        setHasOptionsMenu(true)
+        setHasOptionsMenu(false)
         return view
     }
 
@@ -60,7 +46,7 @@ class View : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.delete){
+        if(item.itemId == R.id.deleteTask){
             deleteUser()
         }
         return super.onOptionsItemSelected(item)
@@ -95,10 +81,12 @@ class View : Fragment() {
             //delete data from room
             mUserViewModel.deleteUser(args.viewParcel)
 
-            Toast.makeText(requireContext(),"deleted succesFully",Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),"deleted successFully",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_view_to_list)
         }
-        builder.setNegativeButton("No"){ _, _ ->}
+        builder.setNegativeButton("No"){ _, _ ->
+            findNavController().navigate(R.id.action_view_to_list)
+        }
             builder.setTitle("Delete ${args.viewParcel.title}")
             System.out.println("Deltt = "+args.viewParcel)
             builder.setMessage("Are you shure you want to delete this ${args.viewParcel.title}")

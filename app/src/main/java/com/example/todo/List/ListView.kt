@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.todo.DataBase.TaskStore
+import com.example.todo.DataBase.Task
 import com.example.todo.DataBase.UserViewModel
 import com.example.todo.LoginActivity
 import com.example.todo.R
@@ -22,9 +22,9 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.fragment_list.view.*
 
+
 class ListView : Fragment() {
     private lateinit var mUserViewModel: UserViewModel
-    private var todoArrayList =  ArrayList<TaskStore>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,15 +42,12 @@ class ListView : Fragment() {
         mUserViewModel.readAllData.observe(viewLifecycleOwner, Observer { user ->
             adapter.setData(user)
             //Show empty data
-            System.out.println("in list view = " + mUserViewModel)
-            System.out.println("in list user = " + user)
-            //adapter.clearData()
+            System.out.println("in list user = $user")
             recycle.adapter = adapter
         })
         //recyclerView.adapter = adapter
-        System.out.println("in list view adapter = " + adapter)
         onBindingFirebase()
-        System.out.println("in list view todoarray = ")
+
 
         //insert button
         view.floatingActionButton2.setOnClickListener{
@@ -67,10 +64,10 @@ class ListView : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.delete){
+        if(item.itemId == R.id.deleteTask){
             deleteAllUser()
         }
-        if (item.itemId == R.id.logout){
+        if (item.itemId == R.id.logoutUser){
             logout()
         }
         return super.onOptionsItemSelected(item)
@@ -93,7 +90,7 @@ class ListView : Fragment() {
         builder.create().show()
     }
 
-    fun deleteAllUser(){
+    private fun deleteAllUser(){
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes"){ _, _ ->
             mUserViewModel.deleteAll()
@@ -101,13 +98,14 @@ class ListView : Fragment() {
             val database = FirebaseDatabase.getInstance("https://testcls-c7487-default-rtdb.asia-southeast1.firebasedatabase.app/")
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
             val databaseReference = database.getReference("users/$userId/getData")
+            System.out.println("Remove that $userId")
             databaseReference.removeValue()
 
             Toast.makeText(requireContext(),"deleted successFully",Toast.LENGTH_SHORT).show()
         }
         builder.setNegativeButton("No"){ _, _ ->}
-            builder.setTitle("Delete ")
-            builder.setMessage("Are you sure you want to delete this? ")
+            builder.setTitle("Delete")
+            builder.setMessage("Are you sure to delete all of task?")
             builder.create().show()
     }
 
@@ -121,22 +119,16 @@ class ListView : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
                     for(userSnapshot in snapshot.children){
-                        val user = userSnapshot.getValue(TaskStore::class.java)
-                        todoArrayList.add(user as TaskStore)
-                        //todoArrayList.clear()
-                        System.out.println("item in list is = "+ user)
-
-                        System.out.println("item in list TaskStore is = " + todoArrayList)
-                        val toList = todoArrayList.toList()
-                        val adapter = TodoAdapter(todoArrayList)
-                        //adapter.setData(toList)
-                        /*recycle.adapter = adapter
-                        System.out.println("item in list TaskStore aapter = " + adapter)*/
-                    }
+                        val taskFirebase = userSnapshot.getValue(Task::class.java)
+                        if (taskFirebase != null) {
+                            mUserViewModel.addUser(taskFirebase as Task)
+                        }
                     }
                 }
+            }
             override fun onCancelled(snapshot: DatabaseError) {
             }
         })
     }
 }
+

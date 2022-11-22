@@ -8,21 +8,21 @@ import androidx.room.*
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addUser(user: User)
+    fun addUser(task: Task)
 
     @Update
-    suspend fun updateUser(user: User)
+    fun updateUser(task: Task)
 
     @Query("SELECT * FROM todoList ORDER BY id ASC")
-    fun readAllData():LiveData<List<User>>
+    fun readAllData():LiveData<List<Task>>
 
     @Delete
-    suspend fun deleteUser(user: User)
+    fun deleteUser(task: Task)
 
     @Query("DELETE FROM todoList")
-    suspend fun deleteAll()
+    fun deleteAll()
 
     @Query("SELECT * FROM todoList ORDER BY id ASC")
-    fun getData():List<User>
+    fun getData():List<Task>
 
 }

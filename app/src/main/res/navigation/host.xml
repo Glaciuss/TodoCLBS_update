@@ -14,6 +14,18 @@
             android:id="@+id/action_list_to_insert"
             app:destination="@id/insert" />
         <action
+            android:id="@+id/action_list_to_check"
+            app:destination="@id/check" />
+        <action
+            android:id="@+id/action_list_to_uncheck"
+            app:destination="@id/uncheck" />
+        <action
+            android:id="@+id/action_list_to_update"
+            app:destination="@id/update" />
+        <action
+            android:id="@+id/action_list_to_delete"
+            app:destination="@id/delete" />
+        <action
             android:id="@+id/action_list_to_view"
             app:destination="@id/view" />
     </fragment>
@@ -40,7 +52,7 @@
             app:popUpToInclusive="true" />
         <argument
             android:name="parcelUpdate"
-            app:argType="com.example.todo.DataBase.User" />
+            app:argType="com.example.todo.DataBase.Task" />
     </fragment>
     <fragment
         android:id="@+id/view"
@@ -49,7 +61,7 @@
         tools:layout="@layout/fragment_view">
         <argument
             android:name="viewParcel"
-            app:argType="com.example.todo.DataBase.User" />
+            app:argType="com.example.todo.DataBase.Task" />
         <action
             android:id="@+id/action_view_to_update"
             app:destination="@id/update" />
@@ -58,5 +70,41 @@
             app:destination="@id/list"
             app:popUpTo="@id/list"
             app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/check"
+        android:name="com.example.todo.xCheck.Check"
+        android:label="fragment_check"
+        tools:layout="@layout/fragment_check" >
+        <argument
+            android:name="check"
+            app:argType="com.example.todo.DataBase.Task" />
+        <action
+            android:id="@+id/action_check_to_list"
+            app:destination="@id/list" />
+    </fragment>
+    <fragment
+        android:id="@+id/uncheck"
+        android:name="com.example.todo.xCheck.Uncheck"
+        android:label="fragment_uncheck"
+        tools:layout="@layout/fragment_uncheck" >
+        <argument
+            android:name="uncheck"
+            app:argType="com.example.todo.DataBase.Task" />
+        <action
+            android:id="@+id/action_uncheck_to_list"
+            app:destination="@id/list" />
+    </fragment>
+    <fragment
+        android:id="@+id/delete"
+        android:name="com.example.todo.xCheck.Delete"
+        android:label="fragment_delete"
+        tools:layout="@layout/fragment_delete" >
+        <action
+            android:id="@+id/action_delete_to_list"
+            app:destination="@id/list" />
+        <argument
+            android:name="del"
+            app:argType="com.example.todo.DataBase.Task" />
     </fragment>
 </navigation>

@@ -1,15 +1,17 @@
 package com.example.todo
 
+import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.example.todo.MainActivity
-import com.example.todo.R
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.appcompat.app.AppCompatActivity
 import com.example.todo.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -19,12 +21,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import java.sql.ClientInfoStatus
-import java.sql.DatabaseMetaData
-import java.util.*
+
 
 class LoginActivity : AppCompatActivity() {
     lateinit var txtEmail:EditText
@@ -68,8 +67,14 @@ class LoginActivity : AppCompatActivity() {
         binding.googleSignBtn.setOnClickListener{
             //begin Google SignIn
             Log.d(TAG,"onCreate: begin Google SignIn")
+
+
             val intent = googleSignInClient.signInIntent
-            startActivityForResult(intent, RC_SIGN_IN)
+
+            //caller old
+            //startActivityForResult(intent, RC_SIGN_IN)
+            //caller
+            resultLauncher.launch(intent)
         }
 
         txtEmail = findViewById<EditText>(R.id.txtEmailCreate)
@@ -108,8 +113,8 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    //receiver old
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(requestCode == RC_SIGN_IN){
@@ -124,7 +129,27 @@ class LoginActivity : AppCompatActivity() {
                 Log.d(TAG,"onActivityResult: failed ${e.message}")
             }
         }
+    }*/
+    //receiver
+    var resultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // There are no request codes
+            val data: Intent? = result.data
+
+            Log.d(TAG, "onActivityResult: google signIn intent")
+            val accountTask = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try{
+                val account = accountTask.getResult(ApiException::class.java)
+                firebaseAuthWithGoogleAccount(account)
+            }
+            catch (e:Exception){
+                //failed SignIn
+                Log.d(TAG,"onActivityResult: failed ${e.message}")
+            }
+
+        }
     }
+
 
     private fun firebaseAuthWithGoogleAccount(account: GoogleSignInAccount?) {
         Log.d(TAG,"firebaseAuthWithGoogleAccount: begin")
